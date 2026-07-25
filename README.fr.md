@@ -49,32 +49,99 @@ Le modèle Pro est considéré comme une source de propositions de recherche, et
 
 ## Installation
 
-Copiez le skill fourni dans le répertoire des skills Codex :
+Commencez par cloner ce dépôt :
 
 ```bash
-cp -R skill/browser-pro-research-orchestrator ~/.codex/skills/
+git clone <repository-url>
+cd browser-pro-research-orchestrator
 ```
 
-Redémarrez ou rouvrez ensuite Codex afin d'actualiser le catalogue des skills.
+### Codex et Kimi Code
+
+Codex et Kimi Code analysent tous deux le répertoire utilisateur partagé des Agent Skills. Une seule installation peut donc servir aux deux :
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R skill/browser-pro-research-orchestrator ~/.agents/skills/
+```
+
+Pour limiter le skill à un seul projet, copiez-le dans :
+
+```text
+<racine-du-projet>/.agents/skills/browser-pro-research-orchestrator/
+```
+
+Redémarrez l'agent de codage si le nouveau répertoire principal de skills n'est pas détecté immédiatement.
+
+### Claude Code
+
+Claude Code utilise son propre répertoire de skills personnels :
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skill/browser-pro-research-orchestrator ~/.claude/skills/
+```
+
+Pour une installation limitée à un projet :
+
+```text
+<racine-du-projet>/.claude/skills/browser-pro-research-orchestrator/
+```
+
+Sous macOS ou Linux, vous pouvez éviter de maintenir deux copies en installant le skill dans `~/.agents/skills/`, puis en créant un lien symbolique pour Claude Code :
+
+```bash
+mkdir -p ~/.claude/skills
+ln -s ~/.agents/skills/browser-pro-research-orchestrator \
+  ~/.claude/skills/browser-pro-research-orchestrator
+```
+
+Le workflow `SKILL.md` et son répertoire `references/` sont portables entre les trois agents. Le fichier `agents/openai.yaml` fournit uniquement des métadonnées d'interface pour Codex ; Kimi Code et Claude Code peuvent l'ignorer.
 
 ## Prérequis
 
-- Codex avec une intégration de contrôle de Chrome ou un connecteur de navigateur équivalent ;
+- Codex, Kimi Code ou Claude Code avec une intégration de contrôle de Chrome, ou un connecteur de navigateur équivalent capable d'utiliser une session déjà authentifiée ;
 - une session de navigateur déjà authentifiée et autorisée à utiliser le modèle Web demandé ;
 - l'autorisation de l'utilisateur pour créer des conversations et envoyer des prompts ;
 - un projet ou espace de travail cible, un modèle et un mode de raisonnement clairement identifiés.
 
-Le skill ne fournit ni abonnement, ni identifiants, ni session de connexion, ni accès à un modèle.
+L'installation du skill installe uniquement le workflow de recherche. Elle n'installe pas de connecteur de navigateur et ne fournit ni abonnement, ni identifiants, ni session de connexion, ni accès à un modèle. Si l'agent hôte ne peut pas contrôler le navigateur authentifié requis ou vérifier le modèle demandé, le skill s'arrête et signale précisément ce blocage.
 
 ## Utilisation
 
-Appelez explicitement le skill :
+La syntaxe d'appel dépend de l'agent :
+
+| Agent | Invocation explicite |
+| --- | --- |
+| Codex | `$browser-pro-research-orchestrator` |
+| Kimi Code | `/skill:browser-pro-research-orchestrator` |
+| Claude Code | `/browser-pro-research-orchestrator` |
+
+Exemple avec Codex :
 
 ```text
 Utilise $browser-pro-research-orchestrator pour décomposer ce projet complexe,
 lancer des recherches Pro indépendantes dans Chrome, les évaluer de manière
 critique et produire un plan d'implémentation réaliste.
 ```
+
+Invocation équivalente dans Kimi Code :
+
+```text
+/skill:browser-pro-research-orchestrator Décompose ce projet complexe,
+lance des recherches Pro indépendantes, évalue chaque proposition de manière
+critique et synthétise une conception implémentable.
+```
+
+Invocation équivalente dans Claude Code :
+
+```text
+/browser-pro-research-orchestrator Décompose ce projet complexe,
+lance des recherches Pro indépendantes, évalue chaque proposition de manière
+critique et synthétise une conception implémentable.
+```
+
+Le skill peut également être activé automatiquement lorsque la demande correspond étroitement à sa description. Une invocation explicite reste préférable pour les longues recherches coûteuses.
 
 Contexte utile à fournir :
 
@@ -85,6 +152,10 @@ Contexte utile à fournir :
 - les fichiers locaux, dépôts, articles ou conversations antérieures ;
 - le modèle Web et le mode de raisonnement exacts ;
 - les méthodes interdites, par exemple Deep Research lorsqu'il ne doit pas être utilisé.
+
+Avant la première écriture dans le navigateur, indiquez le projet ou l'espace Web cible et le modèle exact, puis autorisez explicitement l'agent à créer des conversations, envoyer les prompts initiaux et effectuer les itérations nécessaires dans le périmètre de recherche défini.
+
+Documentation des plateformes : [Codex Agent Skills](https://learn.chatgpt.com/docs/build-skills), [Kimi Code Agent Skills](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/skills.html) et [Claude Code Skills](https://code.claude.com/docs/en/skills).
 
 ## Principes de recherche et d'évaluation
 
