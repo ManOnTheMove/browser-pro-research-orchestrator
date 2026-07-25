@@ -1,0 +1,4 @@
+interface:
+  display_name: "Browser Pro Research Orchestrator"
+  short_description: "Run multi-thread Pro research through Chrome and synthesize it"
+  default_prompt: "Use $browser-pro-research-orchestrator to decompose this complex project, run independent Pro research chats through Chrome, review them, and synthesize a feasible design."
