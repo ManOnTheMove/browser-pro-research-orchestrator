@@ -4,7 +4,7 @@
 
 Turn a signed-in browser session and a web-only Pro model into a panel of slow, independent research specialists—while Codex remains the orchestrator, reviewer, and final decision maker.
 
-![Browser Pro Research Orchestrator research pipeline](docs/browser-pro-research-orchestrator.png)
+![Browser Pro Research Orchestrator research pipeline](docs/browser-pro-research-orchestrator.jpg)
 
 ## Why this skill exists
 
@@ -128,7 +128,7 @@ Weak designs receive narrow corrigenda with concrete counterexamples and request
 ├── README.zh-CN.md
 ├── README.fr.md
 ├── docs/
-│   └── browser-pro-research-orchestrator.png
+│   └── browser-pro-research-orchestrator.jpg
 └── skill/
     └── browser-pro-research-orchestrator/
         ├── SKILL.md
