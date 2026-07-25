@@ -49,32 +49,99 @@ Pro 模型在这里是“研究方案提出者”，而不是权威。只有当�
 
 ## 安装
 
-将仓库中的 Skill 复制到 Codex 的 Skill 目录：
+首先克隆本仓库：
 
 ```bash
-cp -R skill/browser-pro-research-orchestrator ~/.codex/skills/
+git clone <repository-url>
+cd browser-pro-research-orchestrator
 ```
 
-然后重启或重新打开 Codex，让 Skill 列表刷新。
+### Codex 与 Kimi Code
+
+Codex 和 Kimi Code 都会扫描共享的用户级 Agent Skills 目录，因此只需安装一次：
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R skill/browser-pro-research-orchestrator ~/.agents/skills/
+```
+
+如果只希望在单个项目中使用，请复制到：
+
+```text
+<项目根目录>/.agents/skills/browser-pro-research-orchestrator/
+```
+
+如果新创建的顶层 Skills 目录没有立即被识别，请重启对应的 coding agent。
+
+### Claude Code
+
+Claude Code 使用自己的个人 Skills 目录：
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skill/browser-pro-research-orchestrator ~/.claude/skills/
+```
+
+如果只希望在单个项目中使用，请复制到：
+
+```text
+<项目根目录>/.claude/skills/browser-pro-research-orchestrator/
+```
+
+在 macOS 或 Linux 上，也可以先安装到 `~/.agents/skills/`，再为 Claude Code 建立符号链接，从而避免维护两份副本：
+
+```bash
+mkdir -p ~/.claude/skills
+ln -s ~/.agents/skills/browser-pro-research-orchestrator \
+  ~/.claude/skills/browser-pro-research-orchestrator
+```
+
+核心的 `SKILL.md` 工作流和 `references/` 可在三个 agent 之间通用。`agents/openai.yaml` 仅提供 Codex 界面元数据，Kimi Code 和 Claude Code 可以忽略它。
 
 ## 使用条件
 
-- Codex 已安装 Chrome 控制能力或等价的浏览器连接器；
+- Codex、Kimi Code 或 Claude Code 已配置 Chrome 控制能力，或者配置了能够操作现有登录会话的等价浏览器连接器；
 - 浏览器已登录，并且用户本身有权使用指定网页模型；
 - 用户已授权创建对话与发送提示词；
 - 目标项目或 workspace、模型及推理模式都已明确。
 
-本 Skill 不提供订阅、账号凭据、浏览器登录状态或模型访问权限。
+安装 Skill 只会安装研究工作流，不会自动安装浏览器连接器，也不提供订阅、账号凭据、浏览器登录状态或模型访问权限。如果宿主 agent 无法控制所需的登录浏览器或核验指定模型，本 Skill 会停止并明确报告阻塞原因。
 
 ## 使用方式
 
-显式调用该 Skill：
+不同宿主的显式调用方式如下：
+
+| 宿主 | 调用命令 |
+| --- | --- |
+| Codex | `$browser-pro-research-orchestrator` |
+| Kimi Code | `/skill:browser-pro-research-orchestrator` |
+| Claude Code | `/browser-pro-research-orchestrator` |
+
+Codex 示例：
 
 ```text
 使用 $browser-pro-research-orchestrator 拆分这个复杂项目，
 通过 Chrome 运行多个相互独立的 Pro 调研对话，
 对方案进行批判性审查，并综合出可行的实现计划。
 ```
+
+Kimi Code 示例：
+
+```text
+/skill:browser-pro-research-orchestrator 请拆分这个复杂项目，
+运行多个相互独立的 Pro 调研对话，批判性审查每个设计，
+并综合出可实现的方案。
+```
+
+Claude Code 示例：
+
+```text
+/browser-pro-research-orchestrator 请拆分这个复杂项目，
+运行多个相互独立的 Pro 调研对话，批判性审查每个设计，
+并综合出可实现的方案。
+```
+
+当请求与 Skill 描述高度匹配时，agent 也可能自动调用它；但对于耗时且成本较高的长流程调研，建议显式调用。
 
 建议提供：
 
@@ -85,6 +152,10 @@ cp -R skill/browser-pro-research-orchestrator ~/.codex/skills/
 - 本地文件、代码仓库、论文或已有对话；
 - 指定的网页模型及推理模式；
 - 禁止使用的方法，例如明确不使用 Deep Research。
+
+在第一次进行浏览器写入前，请明确目标网页项目或 workspace 和指定模型，并授权 agent 在已说明的研究范围内创建对话、发送首轮提示词及执行后续迭代。
+
+平台文档：[Codex Agent Skills](https://learn.chatgpt.com/docs/build-skills)、[Kimi Code Agent Skills](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/skills.html)和 [Claude Code Skills](https://code.claude.com/docs/en/skills)。
 
 ## 调研与审查原则
 
