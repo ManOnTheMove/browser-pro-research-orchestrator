@@ -49,32 +49,99 @@ The Pro model is treated as a research proposer, not an authority. A module is a
 
 ## Installation
 
-Copy the packaged skill into your Codex skills directory:
+Clone this repository first:
 
 ```bash
-cp -R skill/browser-pro-research-orchestrator ~/.codex/skills/
+git clone <repository-url>
+cd browser-pro-research-orchestrator
 ```
 
-Then restart or reopen Codex so the skill catalog refreshes.
+### Codex and Kimi Code
+
+Codex and Kimi Code both scan the shared user-level Agent Skills directory, so one installation can serve both:
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R skill/browser-pro-research-orchestrator ~/.agents/skills/
+```
+
+For a project-only installation, copy the skill to:
+
+```text
+<project-root>/.agents/skills/browser-pro-research-orchestrator/
+```
+
+Restart the coding agent if the newly created top-level skills directory is not detected immediately.
+
+### Claude Code
+
+Claude Code uses its own personal skills directory:
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skill/browser-pro-research-orchestrator ~/.claude/skills/
+```
+
+For a project-only installation, use:
+
+```text
+<project-root>/.claude/skills/browser-pro-research-orchestrator/
+```
+
+On macOS or Linux, you can avoid maintaining two copies by installing in `~/.agents/skills/` and linking it into Claude Code:
+
+```bash
+mkdir -p ~/.claude/skills
+ln -s ~/.agents/skills/browser-pro-research-orchestrator \
+  ~/.claude/skills/browser-pro-research-orchestrator
+```
+
+The `SKILL.md` workflow and its `references/` are portable across all three agents. `agents/openai.yaml` provides Codex-specific UI metadata and can be ignored by Kimi Code and Claude Code.
 
 ## Requirements
 
-- Codex with a Chrome-control integration or equivalent browser connector;
+- Codex, Kimi Code, or Claude Code with a Chrome-control integration or equivalent browser connector capable of operating an existing signed-in browser session;
 - an existing signed-in browser session with access to the requested web model;
 - user authorization to create conversations and send prompts;
 - a clearly identified target project/workspace and exact model mode.
 
-The skill does not provide a subscription, credentials, browser login, or model access.
+Installing the skill installs the research workflow only. It does not install a browser connector, provide a subscription, credentials, browser login, or model access. If the host agent cannot control the required signed-in browser or verify the requested model, the skill is designed to stop and report that blocker.
 
 ## Usage
 
-Invoke the skill explicitly:
+Invocation syntax differs by host:
+
+| Host | Explicit invocation |
+| --- | --- |
+| Codex | `$browser-pro-research-orchestrator` |
+| Kimi Code | `/skill:browser-pro-research-orchestrator` |
+| Claude Code | `/browser-pro-research-orchestrator` |
+
+Example for Codex:
 
 ```text
 Use $browser-pro-research-orchestrator to decompose this complex project,
 run independent Pro research chats through Chrome, review them critically,
 and synthesize a feasible implementation plan.
 ```
+
+Equivalent Kimi Code invocation:
+
+```text
+/skill:browser-pro-research-orchestrator Decompose this complex project,
+run independent Pro research chats, critically review each design,
+and synthesize an implementable plan.
+```
+
+Equivalent Claude Code invocation:
+
+```text
+/browser-pro-research-orchestrator Decompose this complex project,
+run independent Pro research chats, critically review each design,
+and synthesize an implementable plan.
+```
+
+The skill may also activate automatically when the request closely matches its description, but explicit invocation is recommended for long, expensive research runs.
 
 Useful context to provide:
 
@@ -85,6 +152,10 @@ Useful context to provide:
 - local artifacts, repositories, papers, or prior conversations;
 - the exact web model and reasoning mode;
 - forbidden methods, such as Deep Research when it should not be used.
+
+Before the first browser write, identify the target web project/workspace and exact model, then explicitly authorize the agent to create conversations, send the initial prompts, and perform follow-up iterations within the stated research scope.
+
+Platform references: [Codex Agent Skills](https://learn.chatgpt.com/docs/build-skills), [Kimi Code Agent Skills](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/skills.html), and [Claude Code Skills](https://code.claude.com/docs/en/skills).
 
 ## Research and review principles
 
