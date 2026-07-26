@@ -4,7 +4,7 @@
 
 把已登录的浏览器会话与仅网页端可用的 Pro 模型组织成一组缓慢但彼此独立的研究专家，同时让 Codex 继续负责整体编排、批判性审查和最终决策。
 
-![Browser Pro Research Orchestrator 科研流程图](docs/browser-pro-research-orchestrator.jpg)
+![带有卡皮巴拉研究员的 Browser Pro Research Orchestrator 科研流程图](docs/browser-pro-research-orchestrator-capybara.jpg)
 
 ## 为什么需要这个 Skill
 
@@ -199,7 +199,7 @@ Claude Code 示例：
 ├── README.zh-CN.md
 ├── README.fr.md
 ├── docs/
-│   └── browser-pro-research-orchestrator.jpg
+│   └── browser-pro-research-orchestrator-capybara.jpg
 └── skill/
     └── browser-pro-research-orchestrator/
         ├── SKILL.md
