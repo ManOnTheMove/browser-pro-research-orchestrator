@@ -4,7 +4,7 @@
 
 Transformez une session de navigateur déjà authentifiée et un modèle Pro accessible uniquement sur le Web en un groupe de spécialistes de recherche lents mais indépendants, tout en laissant Codex assurer l'orchestration, l'évaluation critique et la décision finale.
 
-![Pipeline de recherche de Browser Pro Research Orchestrator](docs/browser-pro-research-orchestrator.jpg)
+![Pipeline de Browser Pro Research Orchestrator avec des chercheurs capybaras](docs/browser-pro-research-orchestrator-capybara.jpg)
 
 ## Pourquoi ce skill existe
 
@@ -199,7 +199,7 @@ Les conceptions insuffisantes reçoivent des corrigenda ciblés, accompagnés de
 ├── README.zh-CN.md
 ├── README.fr.md
 ├── docs/
-│   └── browser-pro-research-orchestrator.jpg
+│   └── browser-pro-research-orchestrator-capybara.jpg
 └── skill/
     └── browser-pro-research-orchestrator/
         ├── SKILL.md
