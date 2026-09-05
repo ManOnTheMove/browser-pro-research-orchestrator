@@ -2,50 +2,50 @@
 
 **English** · [简体中文](README.zh-CN.md) · [Français](README.fr.md)
 
-Turn a signed-in browser session and a web-only Pro model into a panel of slow, independent research specialists—while Codex remains the orchestrator, reviewer, and final decision maker.
+Use browser-based ChatGPT GPT-6 Astra Pro to investigate research directions, develop novel ideas, design studies, and build research pipelines, with a local GPT-6 Astra Ultra orchestrator responsible for analysis, critique, and the final recommendation.
 
 ![Browser Pro Research Orchestrator research pipeline with capybara researchers](docs/browser-pro-research-orchestrator-capybara.jpg)
 
 ## Why this skill exists
 
-Complex projects rarely fail because one idea is missing. They fail because several difficult modules must be researched independently, their assumptions must agree, and the resulting design must still fit the available data, compute, interfaces, and deployment constraints.
+A research project can need deep reasoning before there is code, a dataset, or a chosen method. This skill coordinates independent browser analyses around the decision that matters now, then checks their evidence, assumptions, feasibility, and implications locally.
 
-Web-only Pro models can provide unusually broad and deep analysis, but a single long conversation is a poor substitute for coordinated research. It tends to mix modules, lose constraints, and accept its own proposals too easily.
+## Model defaults
 
-This Codex skill supplies the missing orchestration layer.
+- Browser: **GPT-6 Astra with Pro selected**, referred to as GPT-6 Pro. The actual model and mode must be verified in the live controls before every send; an account's Pro badge is insufficient.
+- Local orchestrator: **GPT-6 Astra with Ultra reasoning**, as an operating assumption. The skill does not change local settings or equate Ultra with a web mode or API parameter.
+- An explicit model choice for a later run overrides the default. Otherwise the skill never silently falls back to GPT-5.6 Pro, Thinking, Auto, or another model.
 
-## What it does
+These are workflow defaults, not guarantees of model access or literal UI labels. Other host agents must still satisfy the browser and verification requirements below.
 
-- decomposes a complex project into two to five bounded research modules;
-- creates separate Pro conversations through the user's existing signed-in Chrome session;
-- verifies the selected project, model, and reasoning mode before every send;
-- drafts context-rich prompts that request ordinary web research and primary evidence;
-- waits for long responses without clicking **Answer now** or degrading the result;
-- reviews every proposal for evidence quality, leakage, feasibility, complexity, and operational cost;
-- sends focused revision prompts or restarts a drifting thread;
-- audits interfaces and responsibilities across modules;
-- synthesizes an implementable, falsifiable design with go/no-go gates and fallbacks.
+## Research modes
 
-The workflow is domain-general. It can support software architecture, computer vision, machine learning, scientific pipelines, systems engineering, product design, and other multi-module research tasks.
+| Mode | Decision and deliverable |
+| --- | --- |
+| Direction | Choose among research questions; produce a ranked shortlist and decisive next investigation. |
+| Innovation | Develop candidate contributions; compare closest prior art and define falsification tests. |
+| Study | Define aims, hypotheses, protocol, analysis, feasibility, and advance/pivot/stop criteria. |
+| Pipeline | Specify a minimal baseline, method, interfaces, evaluation, and implementation stages. |
+| Challenge | Assess a proposed direction or design through its strongest objections and alternatives. |
+
+Select the mode or combination that fits the current research decision. The workflow supports empirical, computational, theoretical, and qualitative research; early topic exploration does not require tensors, losses, code, or acquired data. Unrelated brainstorming and routine implementation are outside its scope.
 
 ## How it works
 
 ```text
-DISCOVER
-→ CONTEXT_LOCK
-→ DECOMPOSE
-→ MODEL_VERIFY
-→ PROMPTS_READY
-→ THREADS_SENT
-→ WAITING
-→ REVIEW
-→ REVISE
-→ CROSS_AUDIT
-→ SYNTHESIZE
-→ COMPLETE
+Frame the decision and write a local provisional analysis
+→ lock facts, assumptions, constraints, and unknowns
+→ prepare the smallest useful set of independent workstreams
+→ verify GPT-6 Astra + Pro and send reviewed prompts
+→ wait and capture complete answers
+→ verify primary evidence, challenge claims, and revise as needed
+→ reconcile assumptions, claims, and applicable interfaces
+→ synthesize a research decision and its next test
 ```
 
-The Pro model is treated as a research proposer, not an authority. A module is accepted only after its evidence, assumptions, compute budget, evaluation protocol, failure modes, and interfaces are reviewable.
+A narrow question may need one conversation; difficult open decisions often benefit from two to four. Follow-ups are focused and budgeted. Separate conversations reduce anchoring, but agreement between models is not independent scientific evidence.
+
+The orchestrator preserves long responses without clicking **Answer now**, records submissions to prevent duplicates on resume, and excludes any exchange with invalid model provenance until the necessary consultation is replaced. Ordinary web search is the default; Deep Research requires an explicit request.
 
 ## Installation
 
@@ -103,7 +103,7 @@ The `SKILL.md` workflow and its `references/` are portable across all three agen
 - Codex, Kimi Code, or Claude Code with a Chrome-control integration or equivalent browser connector capable of operating an existing signed-in browser session;
 - an existing signed-in browser session with access to the requested web model;
 - user authorization to create conversations and send prompts;
-- a clearly identified target project/workspace and exact model mode.
+- an unambiguous chat or project destination and a verifiable target model/mode; a dedicated web project is optional.
 
 Installing the skill installs the research workflow only. It does not install a browser connector, provide a subscription, credentials, browser login, or model access. If the host agent cannot control the required signed-in browser or verify the requested model, the skill is designed to stop and report that blocker.
 
@@ -120,9 +120,9 @@ Invocation syntax differs by host:
 Example for Codex:
 
 ```text
-Use $browser-pro-research-orchestrator to decompose this complex project,
-run independent Pro research chats through Chrome, review them critically,
-and synthesize a feasible implementation plan.
+Use $browser-pro-research-orchestrator with GPT-6 Astra Pro in Chrome to
+compare research directions for this problem, examine candidate innovations
+against closest prior work, and recommend a feasible study and its first test.
 ```
 
 Equivalent Kimi Code invocation:
@@ -146,34 +146,24 @@ The skill may also activate automatically when the request closely matches its d
 Useful context to provide:
 
 - the project goal and the decision the research must support;
-- current implementation and measured results;
-- modules that should be researched independently;
-- hard data, compute, latency, and deployment constraints;
+- research stage, available resources, and any existing implementation or measured results;
+- unresolved questions or modules that would benefit from independent analysis;
+- data/access, time, compute, and other relevant research constraints;
 - local artifacts, repositories, papers, or prior conversations;
-- the exact web model and reasoning mode;
+- any explicit override of the default GPT-6 Astra Pro web model;
 - forbidden methods, such as Deep Research when it should not be used.
 
-Before the first browser write, identify the target web project/workspace and exact model, then explicitly authorize the agent to create conversations, send the initial prompts, and perform follow-up iterations within the stated research scope.
+An explicit request to use the skill for a research task authorizes ordinary chats and focused follow-ups within that scope; there is no need to approve every send again. The destination must be unambiguous. A request only to edit the skill or draft prompts does not start a live research run. Sensitive data, uploads, sharing, and recurring monitoring retain their separate authorization requirements.
 
 Platform references: [Codex Agent Skills](https://learn.chatgpt.com/docs/build-skills), [Kimi Code Agent Skills](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/skills.html), and [Claude Code Skills](https://code.claude.com/docs/en/skills).
 
 ## Research and review principles
 
-### Evidence before novelty
-
-Prompts request primary sources and distinguish direct evidence from transferable or conceptual-only evidence. Unsupported gaps remain explicit.
-
-### Feasibility before sophistication
-
-Every proposal is checked for data leakage, unavailable inference inputs, excessive thresholds or losses, unbounded job counts, hidden manual steps, and missing failure cases.
-
-### Interfaces before synthesis
-
-The final cross-audit checks identities, units, tensor shapes, missing-value semantics, threshold ownership, calibration, retry and abstention behavior, artifact provenance, and training-versus-inference fields.
-
-### Iteration before acceptance
-
-Weak designs receive narrow corrigenda with concrete counterexamples and requested equations, pseudocode, interfaces, or budgets. A new conversation is used when a thread has accumulated contradictory assumptions.
+- **Evidence and novelty:** Inspect decision-critical primary sources and closest prior art. Separate direct evidence, transfer assumptions, concepts, and unsupported claims. A search that finds nothing does not prove an idea is new.
+- **Discrimination and falsifiability:** Compare the leading idea with its strongest rival explanation and simplest credible baseline. Define the cheapest informative test and what would reverse the recommendation.
+- **Stage-appropriate feasibility:** Check resource access, timeline, and scientific validity. Apply leakage, inference-input, calibration, tensor, and job-budget checks when the task actually involves them.
+- **Consistency and critique:** Align the problem, gap, contribution, obtainable evidence, and defensible claim across workstreams. Preserve dissent rather than voting on model answers.
+- **Bounded iteration:** Request narrow corrections with concrete counterexamples. Accept a decision, defer a gated claim, or reject a candidate when justified; additional complexity and self-scores are not evidence.
 
 ## Safety and privacy
 
@@ -189,7 +179,7 @@ Weak designs receive narrow corrigenda with concrete counterexamples and request
 - Web interfaces and model names change; selectors and verification steps may require maintenance.
 - Long Pro responses can take tens of minutes and must be monitored without interruption.
 - Browser access, login state, quotas, and model availability remain external dependencies.
-- The final output is a research design, not proof of empirical improvement. Implementation and evaluation are still required.
+- The final output supports a research decision; novelty and effectiveness remain provisional until the relevant source checks, proofs, or experiments establish them.
 
 ## Repository structure
 
@@ -206,7 +196,9 @@ Weak designs receive narrow corrigenda with concrete counterexamples and request
         ├── agents/
         │   └── openai.yaml
         └── references/
+            ├── browser-protocol.md
             ├── prompt-patterns.md
+            ├── research-modes.md
             └── review-rubric.md
 ```
 

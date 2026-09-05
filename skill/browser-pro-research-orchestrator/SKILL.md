@@ -1,275 +1,124 @@
 ---
 name: browser-pro-research-orchestrator
-description: Orchestrate complex project-architecture research through a logged-in Chrome session by running multiple independent ChatGPT Pro conversations, waiting for long responses, critically reviewing and iterating them, auditing cross-module interfaces, and synthesizing an evidence-backed implementable design. Use when Codex cannot call the requested Pro web model directly and a project has multiple difficult or interdependent modules that need literature research, parallel chats, iterative critique, or browser-verified model selection.
+description: Use browser-based ChatGPT GPT-6 Pro to investigate research directions, develop and challenge novel ideas, design studies, and build research pipelines. Coordinate independent Pro conversations through signed-in Chrome, verify the selected model, scrutinize primary evidence, and synthesize a defensible research decision. Use for deep research-project reasoning with the web Pro model, including projects with no code or dataset yet; not for unrelated brainstorming or routine implementation.
 ---
 
 # Browser Pro Research Orchestrator
 
-Use a browser-accessed Pro model as a panel of slow, independent research specialists while retaining Codex as the orchestrator, reviewer, and final decision maker.
+Turn a difficult research question into a defensible decision and an actionable next experiment. The local orchestrator owns the scientific reasoning, context, critique, and synthesis; browser Pro conversations supply independent analyses and challenges.
 
-Do not treat the Pro model as an authority. Treat every response as a research proposal that must pass evidence, feasibility, leakage, and interface review.
+## Model contract
 
-## Required capabilities and authority
+- **Default browser target: ChatGPT GPT-6 Pro — GPT-6 Astra with Pro selected.** The user's names `ChatGPT-6 Pro`, `GPT-6 Pro`, and `GPT-6 ASTRA PRO` express this target. They are not promises about literal UI labels or API model IDs.
+- **Expected local orchestrator: GPT-6 Astra, Ultra reasoning.** Treat this as the user's operating assumption. Use the local model for substantial reasoning and adjudication, not just forwarding prompts. Do not change local settings, map Ultra to a web mode/API parameter, or claim the running model was verified when it was only assumed.
+- A later explicit user model choice overrides the default for that run. Otherwise require the GPT-6 Astra family **and** Pro mode before every browser send. Never silently substitute GPT-5.6 Pro, Thinking, Auto, Instant, or another model.
+- Resolve displayed names from the live model controls. A subscription badge saying Pro, a conversation title, a model's self-description, or an API model listing does not verify the selected web model.
 
-1. Use the Chrome-control skill or equivalent browser connector that can access the user's existing signed-in Chrome session.
-2. Require the user to identify the target web project/workspace and target model, or use the active page only when its identity is unambiguous.
-3. Obtain authority before creating conversations, sending prompts, or sending follow-ups. One explicit authorization may cover later writes within the same stated research scope.
-4. Never store credentials, cookies, account identifiers, fixed project URLs, conversation IDs, or user-specific filesystem paths in this skill.
-5. If Chrome control, login state, project access, or the exact requested model is unavailable, stop and report the precise blocker. Do not silently substitute another model.
+## Scope, access, and authority
 
-## Run state machine
+Use an available browser connector that can operate the user's signed-in Chrome session. Follow its actual documentation; do not assume a named Chrome skill or a fixed selector exists. Keep the requested browser and account context.
 
-Track the run through these states:
+An explicit request to use this skill for a research task authorizes the ordinary research conversations and focused follow-ups necessary within that scope. Reuse existing authorization rather than asking before every send. Merely editing this skill or drafting prompts does not authorize a live research run. Respect separate authorization requirements for sensitive data, uploads, sharing, or actions outside the research scope.
 
-```text
-DISCOVER
-→ CONTEXT_LOCK
-→ DECOMPOSE
-→ MODEL_VERIFY
-→ PROMPTS_READY
-→ THREADS_SENT
-→ WAITING
-→ REVIEW
-→ REVISE
-→ CROSS_AUDIT
-→ SYNTHESIZE
-→ COMPLETE
-```
+Discover the intended ChatGPT project/workspace from the user's instructions and visible context. Ask only if the destination remains ambiguous. A dedicated web project is optional: an unambiguous ordinary chat destination is sufficient. Do not create a project as a prerequisite. Missing code or data is valid in early research; record it instead of blocking ideation.
 
-Use `BLOCKED` only when a required capability, authorization, login, or model is unavailable. Re-enter `WAITING` after every follow-up.
+If login, Chrome access, the intended destination, or exact model verification is unavailable, stop dependent browser sends and name the blocker. Continue useful local preparation, clearly labeled as such; do not report an unperformed Pro consultation as complete.
 
-## 1. Discover and bound the task
+## 1. Frame the decision and select the research mode
 
-Capture:
+Capture the scientific problem, decision to make now, research stage, relevant artifacts, known resources, deadline, and desired output. Separate user requirements from tentative assumptions. Ask for missing information only when it could change the recommendation; otherwise proceed with explicit assumptions and sensitivity analysis.
 
-- the project goal and decision that the research must support;
-- the complex modules or questions;
-- dependencies and interfaces between modules;
-- verified constraints, resource limits, sample size, and deployment conditions;
-- local files, repositories, datasets, papers, and existing conversations;
-- the exact web model and reasoning mode requested;
-- actions already authorized by the user;
-- forbidden tools or methods, such as Deep Research when excluded.
+Read the relevant sections of [references/research-modes.md](references/research-modes.md):
 
-If the user has not decomposed the project, propose the smallest set of independently researchable modules. Create one Pro conversation per module. Keep shared interfaces explicit, but avoid placing all modules in one prompt merely because they interact.
+| Mode | Use when the user needs | Main deliverable |
+|---|---|---|
+| Direction | A research topic or choice among directions | Ranked shortlist, recommendation, decisive next investigation |
+| Innovation | Defensible contributions or new hypotheses | Novelty candidates, closest prior art, falsification tests |
+| Study | A research question turned into a study/project | Aims, hypothesis, protocol, analysis, staged feasibility gates |
+| Pipeline | A chosen research goal turned into a method/system | Minimal baseline, interfaces, evaluation, implementation plan |
+| Challenge | A proposed direction/design critically assessed | Strongest objections, evidence gaps, revision or rejection |
 
-Prefer two to five bounded module chats. Add a separate cross-module audit chat only when the interfaces are themselves a major research problem.
+Combine modes only when the current decision requires it. A full lifecycle can proceed Direction → Innovation → Study → Pipeline, but do not force every request through every stage. Do not require tensors, losses, deployed inference, or code for a question that is not about them.
 
-## 2. Build and lock the context packet
+Before reading Pro conclusions, write a compact local provisional analysis: candidate explanations/directions, important unknowns, likely confounders, decision criteria, and what evidence could reverse the current view. Hold back the local preferred answer from independent discovery prompts unless it is a user-imposed constraint.
 
-Inspect the relevant local artifacts and existing web conversation before prompting the Pro model.
+## 2. Lock context and choose independent workstreams
 
-Create a compact context packet containing:
-
-- verified current implementation;
-- measured results;
-- paper or dataset claims that differ from the implementation;
-- known failure modes;
-- missing artifacts and unimplemented capabilities;
-- hard scientific and engineering constraints;
-- facts that remain uncertain;
-- work that the user explicitly says is obsolete or out of scope.
-
-Separate these categories:
+Inspect relevant local artifacts and existing conversations. Use a versioned context packet with these distinctions:
 
 ```text
-MEASURED IN THE CURRENT SYSTEM
-REPORTED BY A PAPER OR DATASET
+USER GOALS AND HARD CONSTRAINTS
+VERIFIED LOCAL FACTS / MEASURED RESULTS
+REPORTED BY PRIMARY SOURCES
 INFERRED BUT NOT VERIFIED
 PROPOSED FUTURE WORK
+UNKNOWNS / UNAVAILABLE RESOURCES / OUT OF SCOPE
 ```
 
-Never let a paper result, manual-input result, or repository aspiration become a measured result of the current system.
+Attach provenance to decision-critical facts. Never turn a paper result, user estimate, planned dataset, or repository aspiration into a measured local result. Include the relevant content in each prompt; the web model cannot read an unexplained local path. Minimize material transmitted to what the task needs.
 
-Store run artifacts under a neutral workspace-relative directory such as:
+Decompose by **decision uncertainty**, not necessarily by software module. Useful workstreams include opportunity/prior-art search, alternative hypotheses, study design, feasibility, adversarial critique, or a bounded technical module. Record each one's question, inputs, deliverable, dependencies, and acceptance criteria.
+
+Use the smallest useful set: often one conversation for a narrow question, two to four for a difficult open decision. Add another only when it resolves a distinct uncertainty. Dispatch independent initial chats before sharing their conclusions; send dependent design work only after its prerequisites are settled. A browser conversation is not a new Codex task.
+
+Separate conversations reduce conversational anchoring, but shared model training and project memory can still correlate outputs. Record known shared context, provide self-contained prompts, and do not treat agreement as independent scientific evidence. Do not alter account memory settings to manufacture independence.
+
+Set a practical run budget for initial conversations, revision rounds, and elapsed time. Unless the task calls for more, use up to two focused revision rounds per workstream, then decide whether new evidence justifies another, a fresh chat is warranted, or the candidate should be rejected/deferred. More text or agreement alone is not progress.
+
+## 3. Prepare prompts and send with verified model selection
+
+Read [references/prompt-patterns.md](references/prompt-patterns.md) for the shared prompt contract and the pattern matching the chosen mode. Ask for primary-source research, alternatives, a substantive recommendation, explicit uncertainties, and tests capable of disproving the proposal. Use the user's language for the final synthesis; use another prompt/search language only when useful, without assuming English inherently improves reasoning.
+
+Ordinary web search is the default. **Do not activate Deep Research unless the user explicitly requests it.** A request for deep thinking is not a request for that product mode. If explicitly requested Deep Research conflicts with the exact model requirement, resolve that conflict rather than silently switching modes. Follow-up prompts inherit the same tool constraints.
+
+Read [references/browser-protocol.md](references/browser-protocol.md) before the first browser send or when resuming a run. It governs exact model verification, safe submission, long waits, answer capture, and recovery. Verify every initial prompt, revision, and retry; prompt text naming GPT-6 cannot select a model.
+
+## 4. Review, challenge, and revise
+
+Read [references/review-rubric.md](references/review-rubric.md) before accepting a recommendation. Apply common scientific gates and only the domain/stage-specific checks that fit the task.
+
+Locally verify decision-critical citations by opening primary sources and inspecting the relevant methods/results, including the closest prior art and evidence supporting the central claim. A browser Pro answer is a research input, not verification. If a source is inaccessible, label the limitation and withhold claims that depend on inaccessible details. Recalculate important quantities or inspect code/data when available.
+
+Classify each workstream as `ACCEPT`, `CONDITIONAL ACCEPT`, `REVISE`, `RESTART`, or `REJECT`. Acceptance means sufficient to support the stated next research decision, not proof of novelty, effectiveness, or publication prospects. A conditional acceptance must state the unresolved condition, how to test it, and what action remains gated.
+
+For revision, retain valid parts, enumerate blocking errors with evidence/counterexamples, and request only the affected changes. Use corrected hypotheses, controls, comparisons, or decision criteria for conceptual work; use equations, interfaces, and job counts when technical work requires them. Restart a drifted conversation with refreshed facts; do not restart merely because its conclusion is unfavorable.
+
+For consequential direction or novelty decisions, obtain a serious adversarial pass. Use a separate browser critic when it can add an independent analysis; otherwise perform and label the local critique. Compare the strongest case for and against the leading candidate. Preserve substantive dissent and resolve it with evidence or a discriminating experiment, not majority vote or self-scores.
+
+## 5. Audit consistency and synthesize the research decision
+
+Audit the full claim chain at the level appropriate to the task:
 
 ```text
-pro-research/<run-slug>/
+important problem → documented gap → proposed contribution/hypothesis
+→ obtainable evidence → discriminating evaluation → defensible claim
 ```
 
-Use generic filenames:
+Check that population, objective, assumptions, resource access, contribution, controls, success criteria, and timeline agree across workstreams. For pipelines, also audit field ownership, units/shapes, training/inference availability, missingness, calibration, refits, and combined job budgets using the rubric. Apply a single-workstream consistency check when there are no cross-stream interfaces.
 
-```text
-context-lock.md
-module-<name>-prompt.md
-module-<name>-review.md
-run-log.md
-final-synthesis.md
-```
+Send a narrow correction when a contradiction changes the recommendation. If evidence cannot settle it, make the uncertainty and its effect on the decision explicit; do not quietly merge incompatible proposals.
 
-Runtime artifacts may contain user-provided links when needed for that run. The reusable skill itself must not.
+Lead the final synthesis with the recommendation, rationale, confidence, and what would change it. Include only the relevant mode-specific deliverables, plus:
 
-## 3. Design independent research prompts
+- the locked facts and material assumptions;
+- the strongest alternative and why it lost under the stated criteria;
+- evidence for the gap/contribution, nearest prior art, and limits of novelty claims;
+- the cheapest informative next step, staged plan, resources, and go/no-go or pivot criteria;
+- unresolved disagreements and dependencies;
+- traceable primary-source citations, web conversation links, and local artifacts.
 
-Read [references/prompt-patterns.md](references/prompt-patterns.md) when drafting or revising prompts.
+A defensible conclusion may be to abandon a candidate, obtain a missing measurement, or narrow the question. Do not force a positive recommendation. Distinguish a completed research decision from an implemented or experimentally validated result.
 
-Default to English when it improves technical search and model performance, unless the user requests another language.
+## Run records, resumption, and completion
 
-Every initial module prompt must include:
+Store runtime artifacts in a neutral workspace-relative folder such as `pro-research/<run-slug>/`. Maintain `context-lock.md`, `local-analysis.md`, `run-log.md`, and `final-synthesis.md`, plus `workstream-<name>-prompt-v<n>.md`, `workstream-<name>-response-v<n>.md`, and `workstream-<name>-review-v<n>.md` for actual exchanges. Keep a compact claim-to-source ledger in the run log or a separate `evidence-ledger.md` when substantial.
 
-1. a domain-expert role;
-2. the full relevant context packet, not unexplained local references;
-3. a single bounded topic;
-4. an instruction to conduct ordinary web research and verify primary sources;
-5. a clear statement that Deep Research is forbidden unless the user requested it;
-6. current implementation facts and non-negotiable constraints;
-7. literature evidence tiers and an explicit evidence-gap requirement;
-8. architecture or method alternatives, including a low-complexity baseline;
-9. leakage, compute, sample-size, and deployment constraints;
-10. exact tensors, interfaces, losses, state machines, job counts, or other implementable details appropriate to the topic;
-11. falsifiable go/no-go criteria;
-12. a required final recommendation rather than an unranked list.
+Record each conversation's observed link, context/prompt version, verified model/mode, verification time and UI evidence, send status/time, answer capture status, review decision, and next action. Track any monitor identifier and scheduled check time. Runtime links may be private; reusable skill files must remain project-agnostic.
 
-Ask for primary-paper title, year, task/data, method, direct implication, limitation, and DOI/PubMed/journal/arXiv link. Require the model to label direct, transferable, and conceptual-only evidence.
+Track state per workstream: `PREPARED → VERIFIED → SENT → WAITING → CAPTURED → REVIEWED`, followed by a focused revision loop or an explicit acceptance/rejection. Overall states are `FRAMING`, `RESEARCHING`, `REVIEWING`, `SYNTHESIZING`, and `COMPLETE`; record a browser blocker without discarding local progress. On resume, read these artifacts and inspect the existing conversation before sending anything again.
 
-Do not ask the model to redesign another module inside a module-specific chat. Supply the neighboring module's interface as a constraint instead.
+Complete a browser-assisted run only when required responses are fully captured with verified target provenance, blocking objections are resolved or the affected recommendation is explicitly rejected, and the consistency audit and synthesis are finished. If a past send used the wrong or unverified model, retain that error in the log, exclude the response from the required Pro evidence, and complete any necessary replacement consultation before claiming success. Explicit user cancellation can close outstanding work; elapsed budget alone does not turn an unanswered required chat into a completed consultation. Report partial work honestly. Stop only monitors created for this run once they are no longer needed.
 
-## 4. Verify the exact web model before every send
+For an explicit prompt-only or local-preparation request, deliver the reviewed prompts/context and their remaining prerequisites. That requested preparation can be complete without a browser run; do not describe it as completed Pro research.
 
-Use the user's signed-in Chrome session.
-
-Before each new conversation or follow-up:
-
-1. confirm the page belongs to the intended project/workspace;
-2. open the model controls;
-3. verify the requested reasoning mode is selected, such as `Pro`;
-4. verify the exact requested model is selected;
-5. close the menus without changing the selection;
-6. take a fresh page snapshot before locating the prompt box;
-7. ensure the prompt box and send control resolve uniquely;
-8. send only the reviewed prompt;
-9. verify the message is visible and generation has started.
-
-Do not infer the model from a conversation title or prior state. Verify the checked UI items.
-
-Never:
-
-- click `Answer now`;
-- enable Deep Research unless explicitly requested;
-- interrupt a long Pro response because it appears slow;
-- reuse one conversation for independent modules merely to save time;
-- send a follow-up to the wrong project or model.
-
-When the browser-control skill requires tab finalization, make tab finalization the last Chrome operation of the turn.
-
-## 5. Wait without degrading the response
-
-Pro responses may take tens of minutes.
-
-- Do not use a blocking shell sleep.
-- Use a heartbeat, monitor, or scheduled follow-up when available.
-- Default to checking after about 15–20 minutes unless the UI gives a better estimate.
-- If `Stop answering` or equivalent is present, leave the response untouched and schedule another check.
-- If `Answer now` appears, do not click it.
-- When the response completes, read the entire answer, not only the visible tail or executive summary.
-- Record the elapsed time and conversation link in the run log.
-
-Do not report completion while any required module response or review is unfinished.
-
-## 6. Review every response as a skeptical methodologist
-
-Read [references/review-rubric.md](references/review-rubric.md) before accepting a design.
-
-Check:
-
-- whether cited evidence is direct or merely analogous;
-- whether facts match the current implementation;
-- whether training, tuning, calibration, and test data leak into one another;
-- whether compute and job counts are operationally bounded;
-- whether the design has too many features, thresholds, heads, losses, or calibrators for the data;
-- whether failure cases remain in the denominator;
-- whether abstention has a valid target rather than a relabeled proxy;
-- whether the proposed inference inputs exist and contain no ground truth;
-- whether parameter counts and tensor interfaces are code-verifiable;
-- whether simpler baselines can isolate the claimed contribution;
-- whether the design defines kill criteria and a fallback method.
-
-Classify each module:
-
-```text
-ACCEPT
-CONDITIONAL ACCEPT
-REVISE
-RESTART IN A NEW CHAT
-REJECT
-```
-
-Do not accept a high self-score as evidence.
-
-## 7. Send focused revision prompts
-
-When revision is needed:
-
-1. preserve the strong parts explicitly;
-2. enumerate only the blocking errors;
-3. show concrete counterexamples or inconsistent formulas;
-4. demand corrected equations, tensor flow, pseudocode, thresholds, and job counts;
-5. limit new degrees of freedom;
-6. require a short revision memo rather than a repeated literature review;
-7. retain the same model, project, and module scope.
-
-Start a new chat when the conversation has drifted, accumulated contradictory assumptions, or repeatedly ignores the same hard constraint.
-
-Return to `WAITING` after every send. Iterate until the design is implementable and falsifiable, not until it merely sounds sophisticated.
-
-## 8. Perform a cross-module interface audit
-
-After the module chats pass individually, compare them side by side.
-
-Audit:
-
-- shared entity/group/item identity;
-- units, coordinate systems, tensor shapes, and missing-value semantics;
-- overloaded terms such as `usable`, `partial`, `confidence`, or `evidence`;
-- thresholds that use different definitions across modules;
-- which module owns ranking, retry, fallback, calibration, and abstention;
-- training versus inference fields;
-- shared cross-fitting manifests and artifact provenance;
-- distribution shift introduced by final refits;
-- whether separate job budgets are additive or reusable;
-- whether two modules independently reject the same case;
-- whether a downstream module assumes an upstream field that is not produced.
-
-Rename conflicting fields or version the interface instead of relying on prose.
-
-If the interface audit reveals a hard contradiction, send a narrow corrigendum to the responsible module chat. Do not hide the contradiction in the final synthesis.
-
-## 9. Synthesize the implementation plan
-
-Produce a final report that contains:
-
-1. the decision and confidence level for each module;
-2. the verified baseline and factual discrepancies;
-3. the recommended method and minimal baseline;
-4. exact interfaces and responsibility boundaries;
-5. staged implementation order;
-6. shared and additive compute budgets;
-7. go/no-go gates and fallback methods;
-8. leakage-safe evaluation;
-9. unresolved data or code facts;
-10. prohibited over-designed alternatives;
-11. key primary literature;
-12. links to the created web conversations and local prompt artifacts.
-
-Lead with the outcome. State clearly that an accepted design is a research plan, not a measured improvement.
-
-## Completion criteria
-
-Mark the run complete only when:
-
-- every required module has a complete Pro response;
-- the exact requested model was verified for every send;
-- all blocking review items were resolved or explicitly rejected;
-- the cross-module interface audit passed;
-- the final synthesis distinguishes measured facts from proposals;
-- the user can trace prompts, conversations, revisions, and decisions;
-- any recurring monitor created for the run has been stopped.
-
-## Privacy and portability
-
-- Keep the skill project-agnostic.
-- Read project links and filesystem paths only at runtime.
-- Do not write cookies, tokens, account names, project IDs, or conversation IDs into reusable files.
-- Do not assume a fixed ChatGPT URL structure.
-- Do not claim compatibility with another browser agent unless it can perform the same checked UI operations.
-- Preserve user-owned tabs and unrelated browser state.
+Keep credentials, cookies, tokens, account names, fixed project URLs/IDs, conversation IDs, and user-specific paths out of the reusable skill. Read destination details at runtime. Preserve user-owned tabs and unrelated browser state.

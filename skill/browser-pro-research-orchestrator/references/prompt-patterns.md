@@ -1,119 +1,148 @@
 # Prompt patterns
 
-Use these patterns as scaffolding. Replace every angle-bracket placeholder with run-specific context. Do not send unexplained placeholders.
+Use the shared contract plus the relevant mode's assignment. Replace placeholders with actual context before sending; remove inapplicable requirements. A prompt is a bounded research brief, not a command to produce maximum length. Ask for conclusions, evidence, concise rationale, calculations, and tests rather than a hidden chain-of-thought transcript.
 
-## Initial module research
+## Shared initial contract
 
 ```text
-You are a senior methodological researcher in <domain>.
+You are a senior researcher in <domain>, responsible for <bounded question>.
+The decision this analysis must support is <decision at current research stage>.
 
-Conduct an ordinary web-based literature search and design <module>.
-Do not use Deep Research. Verify primary papers or official publication pages;
-do not cite from memory alone.
+CONTEXT AND STATUS
+<relevant self-contained context, with verified facts, source-reported claims,
+assumptions, proposed work, unknowns, and provenance clearly separated>
 
-PROJECT GOAL
-<goal>
+CONSTRAINTS AND BOUNDARIES
+<user priorities, resources, timeline, available/unavailable data, fixed decisions>
+<neighboring workstream inputs/outputs only if relevant>
+Address <scope>. Flag consequential problems outside it without redesigning them.
 
-VERIFIED CURRENT SYSTEM
-<implementation, metrics, interfaces>
+EVIDENCE
+Use ordinary web search to verify primary papers or official source pages.
+Do not activate Deep Research. If search/source access is unavailable, say so;
+do not imply you searched or verified a citation.
+For decision-critical sources provide title, year, task/population/data or
+theoretical setting, relevant result, implication, limitation, and a direct
+DOI, journal, PubMed, arXiv, or other primary-source link. Mark preprints.
+Distinguish direct, transferable, conceptual, and unsupported evidence.
+Separate what a source shows from your inference. Include closest prior art
+and important negative or contradictory evidence; report evidence gaps.
 
-HARD CONSTRAINTS
-<data size, compute, leakage, deployment, forbidden approaches>
+ASSIGNMENT
+<mode-specific assignment below>
 
-NEIGHBORING MODULE INTERFACE
-<inputs received and outputs required>
+DELIVERABLE
+Give a clear recommendation or a justified decision to defer/reject, compared
+with credible alternatives and the simplest appropriate baseline.
+State the main uncertainty, strongest counterargument, what would reverse the
+recommendation, and the cheapest informative next test with go/no-go criteria.
+Do not invent measurements, exact resource counts, novelty, or consensus.
+Use <output language> and detail proportionate to this decision.
+```
 
-ONLY TOPIC
-Address only <module>. Do not redesign <neighboring module>.
+If the user explicitly authorized Deep Research, update the tool instruction in every selected template, including follow-ups, only after resolving any conflict with exact-model requirements. If this is a pure reasoning revision with no new external claims, do not demand a repeated literature search.
 
-LITERATURE REQUIREMENTS
-- Prioritize direct evidence, then transferable evidence.
-- Label conceptual-only evidence.
-- For every key paper provide title, year, task/data, method, implication,
-  limitation, and a primary-source link.
-- State explicitly when direct evidence is absent.
+## Direction assignment
 
-TECHNICAL REQUIREMENTS
-<alternatives, tensors, formulas, losses, state machine, evaluation>
+```text
+Develop a small set of scientifically distinct directions for <problem area>.
+Start from important unresolved questions and the available resources, not a
+preferred tool. For each, state the knowledge gain, closest prior art, possible
+gap, access assumptions, principal risk, and first decisive investigation.
+Compare importance, novelty headroom, tractability, resource fit, time to
+evidence, and negative-result value under <priorities>.
+Recommend a direction and useful backup; show when the ranking would change.
+Do not design a complete pipeline before choosing the research question.
+```
 
-FEASIBILITY
-- Include a low-complexity baseline.
-- Give exact added parameters or a code-verification plan.
-- Give exact model/job counts.
-- Define staged go/no-go criteria and fallback behavior.
+## Innovation assignment
 
-OUTPUT
-1. evidence map;
-2. factual discrepancies;
-3. compared alternatives;
-4. one recommended primary design;
-5. one minimal baseline;
-6. exact implementation contract;
-7. leakage-safe evaluation;
-8. unresolved facts and kill criteria.
+```text
+Develop candidate contributions addressing <bottleneck/question>.
+Include distinct hypotheses or mechanisms, not just renamed combinations.
+For each give the proposed contribution, why it could work, closest existing
+work and exact difference, a testable prediction, strongest rival explanation,
+minimal baseline/control, resources, and a falsifying result.
+Search for prior work using synonyms and adjacent-field terminology, including
+work that would make the claimed novelty disappear. Record search scope/date.
+Rank the candidates and recommend the smallest experiment that distinguishes
+the leading idea from its closest alternative. Novelty is provisional.
+```
+
+## Study assignment
+
+```text
+Turn <chosen question> into a study with a primary hypothesis or explicit
+exploratory objective, coherent aims, and discriminating evidence.
+Specify the appropriate protocol, data/participants/materials, controls,
+measurement or proof strategy, analysis, and principal validity threats.
+Separate confirmatory and exploratory work. Define what positive, negative,
+and inconclusive results would mean for the claim.
+State resource/access dependencies and sample-size or precision assumptions
+when applicable. If inputs are unknown, propose pilot estimation or sensitivity
+ranges instead of invented exact numbers. Include staged advance/pivot/stop
+criteria and a minimal viable study.
+```
+
+## Pipeline assignment
+
+```text
+Design only <module> to serve <research hypothesis/evaluation objective>.
+Respect <neighboring contracts> and the verified current baseline.
+Compare plausible methods and a minimal credible baseline. Supply the needed
+schemas/tensors, formulas, training/inference flow, state machine, and failure
+behavior. Clearly label unavailable fields and quantities requiring code checks.
+Bound compute and job counts, including folds, seeds, tuning, and calibration
+when applicable. Audit leakage, inference-input availability, and attribution
+of improvements. Give implementation stages, gates, and fallback behavior.
+```
+
+## Independent adversarial challenge
+
+Use after initial independent generation. Give the critic the candidate and evidence, without calling it the winning or accepted answer.
+
+```text
+Critically assess this proposal for <decision> using the locked context below.
+<context, proposal, evidence, known constraints>
+
+First state its strongest faithful version. Seek the closest prior work,
+strongest rival explanation, most fragile assumption, and experiment most
+likely to disprove or sharply narrow the claim. Check whether a positive
+result would actually distinguish it from the best simple alternative.
+Use ordinary primary-source search for external claims; no Deep Research.
+Separate fatal objections from fixable gaps and uncertainty. Do not invent
+flaws to satisfy the critic role. Recommend retain/revise/reject and the
+smallest discriminating next step; do not write an unrelated replacement plan.
 ```
 
 ## Focused revision
 
 ```text
-The response has useful elements, but it is not yet accepted.
-Do not repeat the literature review. Do not use Deep Research.
+Preserve <valid elements>. Resolve only these decision-blocking issues:
+1. <claim/assumption/implementation error with evidence or counterexample>
+2. <second blocker if needed>
 
-KEEP
-<strong parts>
-
-RESOLVE THESE BLOCKERS
-1. <specific inconsistency or counterexample>
-2. <feasibility or leakage problem>
-3. <interface or calibration problem>
-
-REQUIRED REVISION
-- Change only the affected formulas, modules, pseudocode, and job table.
-- Remove unearned complexity.
-- Align training targets with inference decisions.
-- Use only fields available at inference.
-- Preserve the neighboring module's ownership boundary.
-- End with one revised design and an honest scored self-audit.
+<locked constraints and context changes since the previous prompt>
+Do not repeat the full review or use Deep Research. Correct only the affected
+hypothesis, comparison, protocol, equations, interface, or budget as applicable.
+Add no new complexity without showing why it is necessary.
+Return a short change memo: issue → correction → affected decision/test;
+include the revised recommendation and remaining uncertainty. If a blocker
+cannot be resolved, state which claim must be withdrawn or gated.
 ```
 
-## Cross-module corrigendum
+## Cross-workstream correction
 
 ```text
-The individual module design is close to acceptable, but the integrated
-interface has a contradiction.
+Two workstreams conflict on <specific issue>.
+Contract/claim A: <exact definition and provenance>
+Contract/claim B: <incompatible assumption and provenance>
+Counterexample or consequence: <why this changes the research decision>
 
-UPSTREAM CONTRACT
-<exact field definitions>
-
-DOWNSTREAM ASSUMPTION
-<exact conflicting definition>
-
-COUNTEREXAMPLE
-<case showing unsafe or undefined behavior>
-
-Provide a short corrigendum that:
-- versions or renames the conflicting fields;
-- aligns training and inference semantics;
-- corrects the state machine;
-- changes no unrelated modules;
-- adds no new learned head unless strictly necessary;
-- states whether model/job counts change.
+Provide a narrow correction preserving unrelated valid work. Align definitions,
+revise the affected hypothesis/evaluation/interface, and state changes to
+resources, dependent work, and the defensible conclusion. If the evidence
+cannot resolve it, specify the discriminating test. No Deep Research.
 ```
 
-## Restart prompt
-
-Use a new chat when the old one has drifted:
-
-```text
-Independently solve <module> from the following locked context.
-Do not inherit conclusions from other chats unless they are listed as verified
-constraints below. Do not use Deep Research.
-
-<fresh context packet>
-
-The prior direction was rejected because:
-<short failure list>
-
-Develop a simpler, falsifiable alternative and compare it with the minimal
-baseline before recommending a final design.
-```
+For a clean restart, reuse the shared contract with current facts and a short factual list of invalid assumptions to avoid. Do not smuggle the previous recommendation in as a verified constraint.
